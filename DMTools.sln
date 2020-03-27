@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{4D94CB14-91F4-4B16-8112-401503181A7C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Users", "Users", "{AF2E4E50-5C73-49C5-9DDF-670CA692341B}"
+ProjectSection(SolutionItems) = preProject
+	API\Users\dev.dockerfile = API\Users\dev.dockerfile
+	API\Users\dev.dockerignore = API\Users\dev.dockerignore
+EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DMTools.Users.API", "API\Users\DMTools.Users.API\DMTools.Users.API.csproj", "{2792C9B6-32BF-4DA5-9BF5-214EB9E96BD2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DMTools.Users.DataAccess", "API\Users\DMTools.Users.DataAccess\DMTools.Users.DataAccess.csproj", "{F2D35A4C-B3FA-436D-956B-68307D136D9B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{038534CF-6BFE-4050-A6AC-EE32052C70A5}"
+ProjectSection(SolutionItems) = preProject
+	dev.docker-compose.yml = dev.docker-compose.yml
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{62E19838-F32E-4073-AA06-C0DF213BBF55}"
+ProjectSection(SolutionItems) = preProject
+	API\Identity\dev.dockerfile = API\Identity\dev.dockerfile
+	API\Identity\dev.dockerignore = API\Identity\dev.dockerignore
+EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer", "API\Identity\IdentityServer\IdentityServer.csproj", "{E3B09592-285A-45DB-989E-3A0678EFE058}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AF2E4E50-5C73-49C5-9DDF-670CA692341B} = {4D94CB14-91F4-4B16-8112-401503181A7C}
+		{2792C9B6-32BF-4DA5-9BF5-214EB9E96BD2} = {AF2E4E50-5C73-49C5-9DDF-670CA692341B}
+		{F2D35A4C-B3FA-436D-956B-68307D136D9B} = {AF2E4E50-5C73-49C5-9DDF-670CA692341B}
+		{62E19838-F32E-4073-AA06-C0DF213BBF55} = {4D94CB14-91F4-4B16-8112-401503181A7C}
+		{E3B09592-285A-45DB-989E-3A0678EFE058} = {62E19838-F32E-4073-AA06-C0DF213BBF55}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2792C9B6-32BF-4DA5-9BF5-214EB9E96BD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2792C9B6-32BF-4DA5-9BF5-214EB9E96BD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2792C9B6-32BF-4DA5-9BF5-214EB9E96BD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2792C9B6-32BF-4DA5-9BF5-214EB9E96BD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2D35A4C-B3FA-436D-956B-68307D136D9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2D35A4C-B3FA-436D-956B-68307D136D9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2D35A4C-B3FA-436D-956B-68307D136D9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2D35A4C-B3FA-436D-956B-68307D136D9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3B09592-285A-45DB-989E-3A0678EFE058}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3B09592-285A-45DB-989E-3A0678EFE058}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3B09592-285A-45DB-989E-3A0678EFE058}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3B09592-285A-45DB-989E-3A0678EFE058}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
