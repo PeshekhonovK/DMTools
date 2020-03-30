@@ -29,7 +29,8 @@ namespace IdentityServer
         {
             return new List<ApiResource>
             {
-                new ApiResource("DMToolsAPI", "DMTools API")
+                new ApiResource("user", "Default role"),
+                new ApiResource("admin", "Admin role")
             };
         }
 
@@ -39,17 +40,27 @@ namespace IdentityServer
             // client credentials client
             return new List<Client>
             {
-                // resource owner password grant client
                 new Client
                 {
-                    ClientId = "DMToolsAPI",
+                    ClientId = "User",
                     AllowedGrantTypes = GrantTypes.ClientCredentials,
                     AllowOfflineAccess = true,
                     ClientSecrets =
                     {
                         new Secret(this.Configuration.Secret.Sha256())
                     },
-                    AllowedScopes = { "DMToolsAPI", IdentityServerConstants.StandardScopes.OfflineAccess },
+                    AllowedScopes = { "user", IdentityServerConstants.StandardScopes.OfflineAccess },
+                },
+                new Client
+                {
+                    ClientId = "Admin",
+                    AllowedGrantTypes = GrantTypes.ClientCredentials,
+                    AllowOfflineAccess = true,
+                    ClientSecrets =
+                    {
+                        new Secret(this.Configuration.Secret.Sha256())
+                    },
+                    AllowedScopes = { "user", "admin", IdentityServerConstants.StandardScopes.OfflineAccess },
                 }
             };
         }

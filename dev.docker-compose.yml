@@ -1,7 +1,6 @@
 version: '3.7'
 
-services:
-  
+services:  
   postgres:
     container_name: 'dmtools.postgres'
     restart: always
@@ -12,12 +11,12 @@ services:
       - postgres-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=dmtoolsdb
+      - POSTGRES_MULTIPLE_DATABASES=dmtoolsdb.identity,dmtoolsdb.users,dmtoolsdb
     networks:
       - aspnetcoreapp-network
   
   identity-server:
-    container_name: 'identity-server'
+    container_name: 'identity.server'
     image: 'identity.server'
     build:
       context: .\API\Identity
@@ -46,8 +45,28 @@ services:
       - "identity-server"
     networks:
       - aspnetcoreapp-network
+
+  web:
+    container_name: 'dmtools.web'
+    image: 'dmtools.web'
+    build:
+      context: .\Web
+      dockerfile: dev.dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /usr/https:/https
+    depends_on:
+      - "postgres"
+      - "identity-server"
+      - "api-users"
+    networks:
+      - aspnetcoreapp-network
         
 volumes:
+  postgres-data-auth:
+  postgres-data-users:
   postgres-data:
       
 networks:

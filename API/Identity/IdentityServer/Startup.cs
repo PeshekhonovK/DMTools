@@ -31,19 +31,19 @@ namespace IdentityServer
             
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
             
-            services.AddDbContext<IdentityServerDbContext>(options => options.UseNpgsql(this.Configuration.GetConnectionString("UsersDbContext")));
+            services.AddDbContext<IdentityServerDbContext>(options => options.UseNpgsql(this.Configuration.GetConnectionString("IdentityDbContext")));
             
             services.AddIdentityServer()
                 .AddConfigurationStore(options =>
                 {
                     options.DefaultSchema = "identity";
-                    options.ConfigureDbContext = b => b.UseNpgsql(this.Configuration.GetConnectionString("UsersDbContext"),
+                    options.ConfigureDbContext = b => b.UseNpgsql(this.Configuration.GetConnectionString("IdentityDbContext"),
                         sql => sql.MigrationsAssembly(migrationsAssembly));
                 })
                 .AddOperationalStore(options =>
                 {
                     options.DefaultSchema = "identity";
-                    options.ConfigureDbContext = b => b.UseNpgsql(this.Configuration.GetConnectionString("UsersDbContext"),
+                    options.ConfigureDbContext = b => b.UseNpgsql(this.Configuration.GetConnectionString("IdentityDbContext"),
                         sql => sql.MigrationsAssembly(migrationsAssembly));
                 });
         }
