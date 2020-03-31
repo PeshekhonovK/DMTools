@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -8,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Exceptions;
+using Serilog.Sinks.Elasticsearch;
 
 namespace IdentityServer
 {
@@ -24,6 +25,8 @@ namespace IdentityServer
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            AddSerilog(services, this.Configuration, Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
+            
             services.AddOptions();
             
             services.Configure<IdentityConfig>(this.Configuration.GetSection("IdentityConfig"));
@@ -59,6 +62,37 @@ namespace IdentityServer
             DatabaseInitializer.Initialize(app, context);
             
             app.UseIdentityServer();
+        }
+        
+        private static IServiceCollection AddSerilog(IServiceCollection services, IConfiguration configuration,
+            string environment)
+        {
+            services.AddLogging(builder => {
+                if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+                var logger = new LoggerConfiguration()
+                    .Enrich.FromLogContext()
+                    .Enrich.WithExceptionDetails()
+                    .Enrich.WithMachineName()
+                    .WriteTo.Debug()
+                    .WriteTo.Console()
+                    .WriteTo.Elasticsearch(ConfigureElasticSink(configuration, environment))
+                    .Enrich.WithProperty("Environment", environment)
+                    .ReadFrom.Configuration(configuration)
+                    .CreateLogger();
+                
+            });
+
+            return services;
+        }
+        
+        private static ElasticsearchSinkOptions ConfigureElasticSink(IConfiguration configuration, string environment)
+        {
+            return new ElasticsearchSinkOptions(new Uri(configuration["ElasticConfiguration:Uri"]))
+            {
+                AutoRegisterTemplate = true,
+                IndexFormat = $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{environment?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}"
+            };
         }
     }
 }

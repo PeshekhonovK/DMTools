@@ -33,6 +33,12 @@ EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DMTools.Web", "Web\DMTools.Web\DMTools.Web.csproj", "{03FE3B63-97F9-4EAF-AABF-37F9158BF112}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "postgres", "postgres", "{4B72D1B8-4C16-4B53-A984-0DF1C38620F5}"
+ProjectSection(SolutionItems) = preProject
+	postgres\create-multiple-postgresql-databases.sh = postgres\create-multiple-postgresql-databases.sh
+	postgres\.dockerfile = postgres\.dockerfile
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

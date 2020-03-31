@@ -1,17 +1,13 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.EntityFrameworkCore;
-using DMTools.Web.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Exceptions;
+using Serilog.Sinks.Elasticsearch;
 
 namespace DMTools.Web
 {
@@ -27,6 +23,8 @@ namespace DMTools.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            AddSerilog(services, this.Configuration, Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
+            
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
@@ -61,6 +59,37 @@ namespace DMTools.Web
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
+        }
+        
+        private static IServiceCollection AddSerilog(IServiceCollection services, IConfiguration configuration,
+            string environment)
+        {
+            services.AddLogging(builder => {
+                if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+                var logger = new LoggerConfiguration()
+                    .Enrich.FromLogContext()
+                    .Enrich.WithExceptionDetails()
+                    .Enrich.WithMachineName()
+                    .WriteTo.Debug()
+                    .WriteTo.Console()
+                    .WriteTo.Elasticsearch(ConfigureElasticSink(configuration, environment))
+                    .Enrich.WithProperty("Environment", environment)
+                    .ReadFrom.Configuration(configuration)
+                    .CreateLogger();
+                
+            });
+
+            return services;
+        }
+        
+        private static ElasticsearchSinkOptions ConfigureElasticSink(IConfiguration configuration, string environment)
+        {
+            return new ElasticsearchSinkOptions(new Uri(configuration["ElasticConfiguration:Uri"]))
+            {
+                AutoRegisterTemplate = true,
+                IndexFormat = $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{environment?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}"
+            };
         }
     }
 }
