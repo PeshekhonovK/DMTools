@@ -2,6 +2,30 @@ version: '3.7'
 
 services:
   
+  filebeat:
+    hostname: "{{.Node.Hostname}}-filebeat"
+    user: root
+    container_name: 'dmtools.filebeat'
+    image: docker.elastic.co/beats/filebeat:7.6.1
+    networks:
+      - internal
+    volumes:
+      - filebeat:/usr/share/filebeat/data
+      - /var/run/docker.sock:/var/run/docker.sock
+      # This is needed for filebeat to load container log path as specified in filebeat.yml
+      - /var/lib/docker/containers/:/var/lib/docker/containers/:ro
+      # This is needed for filebeat to load logs for system and auth modules
+      - /var/log/:/var/log/:ro
+      - /usr/share/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      #- filebeatconfig:/usr/share/filebeat
+    environment:
+      - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST:-'dmtools.elasticsearch'}
+      - KIBANA_HOST=${KIBANA_HOST:-'dmtools.kibana'}
+      - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME:-elastic}
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD:-123qwe!E}
+    # disable strict permission checks
+    command: ["--strict.perms=false"]
+  
   elasticsearch:
     container_name: 'dmtools.elasticsearch'
     image: docker.elastic.co/elasticsearch/elasticsearch:7.6.1
@@ -14,6 +38,9 @@ services:
       - xpack.watcher.enabled=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - discovery.type=single-node
+      - ELASTIC_PASSWORD=123qwe!E
+    depends_on:
+      - filebeat
     networks:
       - internal
 
@@ -23,6 +50,7 @@ services:
     ports:
       - 5601:5601
     depends_on:
+      - filebeat
       - elasticsearch
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch
@@ -55,11 +83,10 @@ services:
     ports:
       - "8000:443"
     volumes:
-      - /usr/https:/https
+      - /usr/https:/https:ro
     depends_on:
-      - "postgres"
-      - "elasticsearch"
-      - "kibana"
+      - postgres
+      - kibana
     networks:
       - internal
 
@@ -72,12 +99,10 @@ services:
     ports:
       - "8001:443"
     volumes:
-      - /usr/https:/https
+      - /usr/https:/https:ro
     depends_on:
-      - "postgres"
-      - "identity-server"
-      - "elasticsearch"
-      - "kibana"
+      - postgres
+      - identity-server
     networks:
       - internal
 
@@ -91,15 +116,15 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /usr/https:/https
+      - /usr/https:/https:ro
     depends_on:
-      - "postgres"
-      - "identity-server"
-      - "api-users"
-      - "elasticsearch"
-      - "kibana"
+      - api-users
     networks:
-      - internal  
+      - internal
+  
+volumes:
+  filebeat:
+  filebeatconfig:
       
 networks:
   internal:

@@ -11,20 +11,22 @@ namespace DMTools.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private ILogger<HomeController> Logger { get; }
 
         public HomeController(ILogger<HomeController> logger)
         {
-            _logger = logger;
+            this.Logger = logger;
         }
 
         public IActionResult Index()
         {
+            this.Logger.LogDebug($"{nameof(this.Index)} THIS IS TEST DEBUG MESSAGE");
             return View();
         }
 
         public IActionResult Privacy()
         {
+            this.Logger.LogWarning($"{nameof(this.Privacy)} THIS IS TEST WARN MESSAGE");
             return View();
         }
 

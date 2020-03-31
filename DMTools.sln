@@ -39,6 +39,11 @@ ProjectSection(SolutionItems) = preProject
 	postgres\.dockerfile = postgres\.dockerfile
 EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "elk", "elk", "{BF8B98DB-53D2-4D8F-AB56-DD3F2F00CA90}"
+ProjectSection(SolutionItems) = preProject
+	elk\filebeat.yml = elk\filebeat.yml
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

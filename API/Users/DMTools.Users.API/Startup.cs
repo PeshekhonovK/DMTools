@@ -26,8 +26,6 @@ namespace DMTools.Users.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-
-            AddSerilog(services, this.Configuration, Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
             
             services.AddDbContext<UsersDbContext>(options => {
                 options.UseNpgsql(this.Configuration.GetConnectionString("UsersDbContext"));
@@ -50,37 +48,6 @@ namespace DMTools.Users.API
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
             
-        }
-        
-        private static IServiceCollection AddSerilog(IServiceCollection services, IConfiguration configuration,
-            string environment)
-        {
-            services.AddLogging(builder => {
-                if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-                var logger = new LoggerConfiguration()
-                    .Enrich.FromLogContext()
-                    .Enrich.WithExceptionDetails()
-                    .Enrich.WithMachineName()
-                    .WriteTo.Debug()
-                    .WriteTo.Console()
-                    .WriteTo.Elasticsearch(ConfigureElasticSink(configuration, environment))
-                    .Enrich.WithProperty("Environment", environment)
-                    .ReadFrom.Configuration(configuration)
-                    .CreateLogger();
-                
-            });
-
-            return services;
-        }
-        
-        private static ElasticsearchSinkOptions ConfigureElasticSink(IConfiguration configuration, string environment)
-        {
-            return new ElasticsearchSinkOptions(new Uri(configuration["ElasticConfiguration:Uri"]))
-            {
-                AutoRegisterTemplate = true,
-                IndexFormat = $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{environment?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}"
-            };
         }
     }
 }

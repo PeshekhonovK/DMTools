@@ -15,6 +15,7 @@ RUN dotnet publish -c Debug -o out --no-self-contained -r linux-x64
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-alpine
 WORKDIR /app
 COPY --from=build-env /app/out .
+ENV ASPNETCORE_ENVIRONMENT="Development"
 ENV ASPNETCORE_URLS="https://+"
 ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnet.pfx
 ENV ASPNETCORE_Kestrel__Certificates__Default__Password="123qwe!E"
