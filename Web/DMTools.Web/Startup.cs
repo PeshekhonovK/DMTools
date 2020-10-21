@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using DMTools.Web.Areas.Identity.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -27,10 +28,13 @@ namespace DMTools.Web
         {
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            services.AddSingleton<DatabaseInitializer>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory, 
+            IdentityDataContext identityContext)
         {
             if (env.IsDevelopment())
             {
@@ -48,6 +52,12 @@ namespace DMTools.Web
             app.UseStaticFiles();
 
             app.UseRouting();
+            
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                var initializer = serviceScope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
+                initializer.Initialize(app, identityContext);
+            }
 
             app.UseAuthentication();
             app.UseAuthorization();

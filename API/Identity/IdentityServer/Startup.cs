@@ -47,6 +47,8 @@ namespace IdentityServer
                     options.ConfigureDbContext = b => b.UseNpgsql(this.Configuration.GetConnectionString("IdentityDbContext"),
                         sql => sql.MigrationsAssembly(migrationsAssembly));
                 });
+
+            services.AddSingleton<DatabaseInitializer>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,7 +59,11 @@ namespace IdentityServer
                 app.UseDeveloperExceptionPage();
             }
             
-            DatabaseInitializer.Initialize(app, context);
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                var initializer = serviceScope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
+                initializer.Initialize(app, context);
+            }
             
             app.UseIdentityServer();
         }

@@ -6,17 +6,20 @@ services:
     hostname: "{{.Node.Hostname}}-filebeat"
     user: root
     container_name: 'dmtools.filebeat'
-    image: docker.elastic.co/beats/filebeat:7.6.1
+    image: 'dmtools.filebeat'
+    build:
+      context: ./filebeat
+      dockerfile: .dockerfile
     networks:
       - internal
     volumes:
-      - filebeat:/usr/share/filebeat/data
+      - filebeatdata:/usr/share/filebeat/data/
       - /var/run/docker.sock:/var/run/docker.sock
       # This is needed for filebeat to load container log path as specified in filebeat.yml
       - /var/lib/docker/containers/:/var/lib/docker/containers/:ro
       # This is needed for filebeat to load logs for system and auth modules
       - /var/log/:/var/log/:ro
-      - /usr/share/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - /home/kpeshekhonov/git/DMTools/elk/filebeat.yml:/usr/share/filebeat/filebeat.yml
       #- filebeatconfig:/usr/share/filebeat
     environment:
       - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST:-'dmtools.elasticsearch'}
@@ -32,7 +35,7 @@ services:
     ports:
       - 9200:9200
     volumes:
-      - /usr/elasticsearch/data:/usr/share/elasticsearch/data
+      - /home/kpeshekhonov/elasticsearch/data/:/usr/share/elasticsearch/data/
     environment:
       - xpack.monitoring.enabled=true
       - xpack.watcher.enabled=false
@@ -62,12 +65,12 @@ services:
     restart: always
     image: postgres
     build:
-      context: .\postgres
+      context: ./postgres
       dockerfile: .dockerfile
     ports:
       - "5432:5432"
     volumes:
-      - /usr/postgres/data:/var/lib/postgresql/data
+      - /usr/postgres/data_dmtools/:/var/lib/postgresql/data/
     environment:
       - POSTGRES_PASSWORD=root
       - POSTGRES_MULTIPLE_DATABASES=dmtoolsdb_identity,dmtoolsdb_users,dmtoolsdb
@@ -78,12 +81,12 @@ services:
     container_name: 'identity.server'
     image: 'identity.server'
     build:
-      context: .\API\Identity
+      context: ./API/Identity
       dockerfile: dev.dockerfile
     ports:
       - "8000:443"
     volumes:
-      - /usr/https:/https:ro
+      - /home/kpeshekhonov/https:/https:ro
     depends_on:
       - postgres
       - kibana
@@ -94,12 +97,12 @@ services:
     container_name: 'dmtools.users'
     image: 'dmtools.users'
     build:
-      context: .\API\Users
+      context: ./API/Users
       dockerfile: dev.dockerfile
     ports:
       - "8001:443"
     volumes:
-      - /usr/https:/https:ro
+      - /home/kpeshekhonov/https:/https:ro
     depends_on:
       - postgres
       - identity-server
@@ -110,20 +113,20 @@ services:
     container_name: 'dmtools.web'
     image: 'dmtools.web'
     build:
-      context: .\Web
+      context: ./Web
       dockerfile: dev.dockerfile
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - /usr/https:/https:ro
+      - /home/kpeshekhonov/https:/https:ro
     depends_on:
       - api-users
     networks:
       - internal
   
 volumes:
-  filebeat:
+  filebeatdata:
   filebeatconfig:
       
 networks:

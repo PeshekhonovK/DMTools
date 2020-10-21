@@ -44,6 +44,11 @@ ProjectSection(SolutionItems) = preProject
 	elk\filebeat.yml = elk\filebeat.yml
 EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "filebeat", "filebeat", "{087DEB20-7230-404D-AE7C-307E6C52456E}"
+ProjectSection(SolutionItems) = preProject
+	filebeat\.dockerfile = filebeat\.dockerfile
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

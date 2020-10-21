@@ -1,21 +1,41 @@
+using System;
 using System.Linq;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace IdentityServer
 {
     public class DatabaseInitializer
     {
-        public static void Initialize(IApplicationBuilder app, IdentityServerDbContext context)
+        private ILogger Logger { get; }
+        
+        public DatabaseInitializer(ILogger<DatabaseInitializer> logger)
         {
-            context.Database.EnsureCreated();
+            Logger = logger;
+        }
 
-            InitializeTokenServerConfigurationDatabase(app);
+        public void Initialize(IApplicationBuilder app, IdentityServerDbContext context)
+        {
+            try
+            {
+                this.Logger.LogInformation($"Started initialization of database");
+                
+                context.Database.EnsureCreated();
 
-            context.SaveChanges();
+                InitializeTokenServerConfigurationDatabase(app);
+
+                context.SaveChanges();
+                
+                this.Logger.LogInformation($"Finished initialization of database");
+            }
+            catch (Exception ex)
+            {
+                this.Logger.LogCritical(ex, "Unexpected error occured during database initialization");
+            }
         }
 
         private static void InitializeTokenServerConfigurationDatabase(IApplicationBuilder app)
